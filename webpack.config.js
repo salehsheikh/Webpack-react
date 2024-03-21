@@ -1,7 +1,9 @@
 const port = process.env.PORT || 8080;
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+const {CleanWebpackPlugin} =require ('clean-webpack-plugin');
+const MiniCsExtractPlugin=require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin=require('optimize-css-assets-webpack-plugin')
 module.exports = {
     entry:'./src/index.js',
 
@@ -11,7 +13,8 @@ module.exports = {
     // },
   output: {
     path: path.join(__dirname, '/dist'),
-    filename: 'main.[fullhash].js'
+    filename: 'main.[fullhash].js',
+    chunkFilename:'[name].bundle.[fullhash].js'
   },
   module: {
     rules: [
@@ -25,7 +28,8 @@ module.exports = {
       {
         test:/\.css$/,
         use:[
-          "style-loader",
+          // "style-loader",
+          MiniCsExtractPlugin.loader,
           "css-loader",
           // "sass-loader"
     ]
@@ -51,11 +55,18 @@ module.exports = {
     ]
   },
 
- 
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html'
-    })
+      template: './src/index.html',
+      minify:{
+        removeAttributeQuotes:true,
+        collapseWhitespace:true,
+        removeComments:true
+      }
+    }),
+    new OptimizeCssAssetsPlugin(),
+    new CleanWebpackPlugin(),
+    new MiniCsExtractPlugin({filename:"[name].[fullhash].css"})
   ],
   devServer: {
     host: "localhost",
